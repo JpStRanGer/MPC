@@ -1,2 +1,8 @@
-def test():
-    print(f"My name is Jonas, and this comes from the module \"model\"")
+def objectiveFunction(x,*arg):
+    return
+
+class MPC:
+    def __init__():
+        from scipy.optimize import minimize
+
+        return
