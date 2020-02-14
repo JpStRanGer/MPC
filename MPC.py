@@ -5,12 +5,12 @@ def objectiveFunction(x,*arg):
     # Unpacking Testing Values for U
     U_test = x
     # Unpacking Values Sendt Throw Arguments
-    SP_test = arg[0]
-    dt_test = arg[1]
+    dt_test = arg[0]
     
     # Defining Model Arrays
-    Y_test = arg[0] * 0
     time_test = arg[1]
+    SP_test = arg[1]
+    Y_test = SP_test * 1
     
     # Defining parameters for the testing model
     timeDelay_test = 10
@@ -35,13 +35,13 @@ def objectiveFunction(x,*arg):
 
 
     # Running simulation of "real" model function
-    for k in range(len(arg[0])):
+    for k in range(len(time_test)):
         Y_test[k] = obj_model_test.run(u_k = U_test) 
 
     #      DONE SIMULATING "REALSYSTEM"       #
     #|||||||||||||||||||||||||||||||||||||||||#
     plt.figure()
-    plt.plot(time_test,SP_test)
+    #plt.plot(time_test,SP_test)
     plt.plot(time_test,Y_test)
     plt.grid()
     plt.show()
@@ -49,15 +49,31 @@ def objectiveFunction(x,*arg):
     return error
 
 class MPC:
-    def __init__(self, dt):
+    def __init__(self, dt, pred_horizion_length, NumberOfBlocks):
         import model
         from scipy.optimize import minimize
+        # Defining values
+        self.pred_horizion_length = pred_horizion_length # [Sec]
+        self.NS_pred_horizion = int(pred_horizion_length/dt)+1 # Numer Of samples In Pred Horizion
+        self.NumberOfBlocks = NumberOfBlocks # [stk]
+        self.initial_guess = 0
+        self.Setpoint = 0
+        # Defining Arrays
+        self.pred_horizion_array = np.linspace(0,pred_horizion_length,NS_pred_horizion)
+        self.U_guess = [initial_guess for i in range(NumberOfBlocks)]
         
         ################
         # Initiating modelobject to be simulated
-        obj_model_test = model.secDegModel(dt)
+        self.obj_model_test = model.secDegModel(dt)
+        
         
         return
+    
+    def run(self):
+        self.arg_guess = (SP,self.pred_horizion)
+        solution_guess = minimize(objectiveFunction,U_guess,arg_guess, method = "SLSQP")
+        self.x_opt = solution_guess
+        return self.x_opt
 
 if __name__ == "__main__":
     import model
@@ -65,12 +81,11 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from scipy.optimize import minimize
     start = 0
-    stop = 1000
+    stop = 10
     dt = 0.1
     ns = int((stop-start)/dt)+1
     
     time = np.linspace(start,stop,ns)
     Y = time * 0
-
-
-def objectiveFunction(x,*arg):
+    
+    obj_mpc = MPC
