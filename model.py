@@ -1,5 +1,5 @@
 class secDegModel:
-    def __init__(self, dt, K =1, Tc1 = 4, Tc2 = 4, timeDelay = 10, initStateValue = 0, initDelayValue = 0):
+    def __init__(self, dt, K =1, Tc1 = 4, Tc2 = 4, timeDelay = 10, initStateValue = 0, initDelayValue = 1):
         # Import Needed Modules
         
         # Define objects

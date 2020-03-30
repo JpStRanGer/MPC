@@ -1,10 +1,10 @@
-def objectiveFunction(x,*arg):
+def objectiveFunction(u_guess,*arg):
     # Importing needed modules
     import model
     import numpy as np
     import matplotlib.pyplot as plt
     # Unpacking Testing Values for U
-    U_test = x
+    U_test = u_guess
     # Unpacking Values Sendt Throw Arguments
     dt_test = arg[0]
     setpoint_test = arg[1]
@@ -42,11 +42,11 @@ def objectiveFunction(x,*arg):
     ###########################################
 
     # Diffing blocks
-    # Assign all values for x into eacual spaced in U_array test
-    N_blocks_u = len(x)  # Number of blocks of control signal
+    # Assign all values for u_guess into eacual spaced in U_array test
+    N_blocks_u = len(u_guess)  # Number of blocks of control signal
     N_samples_in_blocks = int(np.ceil(NS_pred_horizion_test/N_blocks_u))  # Number of samples in each control block
     
-    U_array_test = np.array([np.zeros(N_samples_in_blocks) + x for x in x])
+    U_array_test = np.array([np.zeros(N_samples_in_blocks) + u_guess for u_guess in u_guess])
     U_array_test = np.concatenate(U_array_test)
     U_array_test = U_array_test[:NS_pred_horizion_test]
 
@@ -64,6 +64,7 @@ def objectiveFunction(x,*arg):
     plt.legend()
     plt.grid()
     plt.show()
+    
     error = np.sum(abs(SP_array_test-Y_array_test))
     return error
 
