@@ -10,15 +10,16 @@ def objectiveFunction(x,*arg):
     setpoint_test = arg[1]
     pred_horizion_length_test = arg[2]
     initStateValue_test = arg[3]
+    initDelayValue_test = arg[4]
     # Defining Model Arrays
     NS_pred_horizion_test = int(pred_horizion_length_test/dt_test)+1
     pred_horizion_array_test = np.linspace(0, pred_horizion_length_test, NS_pred_horizion_test)
     SP_array_test = np.zeros(NS_pred_horizion_test) + setpoint_test
-    Y_array_test = SP_array_test * 0
+    Y_array_test = np.zeros(NS_pred_horizion_test)
+    U_array_test = np.zeros(NS_pred_horizion_test)
     
     # Defining parameters for the testing model
-    timeDelay_test = 50
-    initDelayValue_test = 0
+    timeDelay_test = 10
     K_test = 4
     Tc1_test = 30
     Tc2_test = 60
@@ -40,70 +41,34 @@ def objectiveFunction(x,*arg):
     #|||||||||||||||||||||||||||||||||||||||||#
     ###########################################
 
+    # Diffing blocks
+    # Assign all values for x into eacual spaced in U_array test
+    N_blocks_u = len(x)  # Number of blocks of control signal
+    N_samples_in_blocks = int(np.ceil(NS_pred_horizion_test/N_blocks_u))  # Number of samples in each control block
+    
+    U_array_test = np.array([np.zeros(N_samples_in_blocks) + x for x in x])
+    U_array_test = np.concatenate(U_array_test)
+    U_array_test = U_array_test[:NS_pred_horizion_test]
 
     # Running simulation of "real" model function
     for k in range(NS_pred_horizion_test):
-        Y_array_test[k] = obj_model_test.run(u_k = U_test) 
+        Y_array_test[k] = obj_model_test.run(u_k = U_array_test[k]) 
 
-    #      DONE SIMULATING "REALSYSTEM"       #
+
+    #     DONE SIMULATING "REALSYSTEM"       #
     #|||||||||||||||||||||||||||||||||||||||||#
-#    plt.figure(2)
-#    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
-#    plt.plot(pred_horizion_array_test,Y_array_test,label="putput")
-#    plt.legend()
-#    plt.grid()
-#    plt.show()
+    
+    plt.figure(2)
+    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
+    plt.plot(pred_horizion_array_test,Y_array_test,label="Output")
+    plt.legend()
+    plt.grid()
+    plt.show()
     error = np.sum(abs(SP_array_test-Y_array_test))
     return error
 
-def objectiveFunction_TEST(x,*arg):
-    # Importing needed modules
-    import numpy as np
-    import matplotlib.pyplot as plt
-    # Unpacking Testing Values for U
-    U_test = x
-    # Unpacking Values Sendt Throw Arguments
-    dt_test = arg[0]
-    setpoint_test = arg[1]
-    pred_horizion_length_test = arg[2]
-    initStateValue_test = arg[3]
-    obj_model_test = arg[4]
-    # Defining Model Arrays
-    NS_pred_horizion_test = int(pred_horizion_length_test/dt_test)+1
-    pred_horizion_array_test = np.linspace(0, pred_horizion_length_test, NS_pred_horizion_test)
-    SP_array_test = np.zeros(NS_pred_horizion_test) + setpoint_test
-    Y_array_test = SP_array_test * 0
-    
-    # Defining parameters for the testing model
-    timeDelay_test = 50
-    initDelayValue_test = 0
-    K_test = 4
-    Tc1_test = 30
-    Tc2_test = 60
-    
-                                      
-    
-    ###########################################
-    #|||||||||||||||||||||||||||||||||||||||||#
-    #     Testing Values for U on Model       #
-    #|||||||||||||||||||||||||||||||||||||||||#
-    ###########################################
 
-    obj_model_test.setState(initStateValue_test)
-    # Running simulation of "real" model function
-    for k in range(NS_pred_horizion_test):
-        Y_array_test[k] = obj_model_test.run(u_k = U_test) 
 
-    #      DONE SIMULATING "REALSYSTEM"       #
-    #|||||||||||||||||||||||||||||||||||||||||#
-#    plt.figure(2)
-#    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
-#    plt.plot(pred_horizion_array_test,Y_array_test,label="putput")
-#    plt.legend()
-#    plt.grid()
-#    plt.show()
-    error = np.sum(abs(SP_array_test-Y_array_test))
-    return error
 
 if __name__ == "__main__":
     import numpy as np
@@ -116,5 +81,5 @@ if __name__ == "__main__":
     time = np.linspace(start,stop,ns)
     Y = time * 0
     
-    # objectiveFunction(U, dt, SP, PredTime, initStateValue)
-    objectiveFunction(0.28658928,0.1,2,300,3)
+    # objectiveFunction(U, dt, SP, PredTime, initStateValue, initDelayValue)
+    objectiveFunction([1,0,0.5],0.1,2,300,0,0)
