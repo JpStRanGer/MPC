@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 import model
-import MPC
+import mimoMPC
 
 #####################
 # TODO:
@@ -14,13 +14,13 @@ import MPC
 
 #%% TIME PARAMETRIZATION
 start = 0
-stop = 1000
+stop = 2000
 dt = 0.1
 ns = int((stop-start)/dt)+1
 time = np.linspace(start,stop,ns)
 
 # Definging SETPOINT
-SP = np.array([1 if t < 20 else
+SP = np.array([1 if t < 500 else
                2 for t in time])
 
 U = SP#time * 0
@@ -36,11 +36,14 @@ obj_mpc = MPC.mpc(dt = dt, pred_horizion_length = prediction_horizion)
 #%% MAIN LOOP
 for k in range(len(time)):
     u_k = obj_mpc.u_opt[0]
+    U[k] = u_k
     turb[k] = obj_processModel.run(u_k)
     obj_mpc.run(SP[k],turb[k])
     
     plt.figure(1)
-    plt.plot(time[:k],SP[:k],label="Setpunkt Turb")
+    plt.title("From MAIN")
+    plt.plot(time[:k],U[:k],label="controler output")
+    plt.plot(time[:],SP[:],label="Setpunkt Turb")
     
     plt.plot(time[:k],turb[:k],label="Turb (REAL)")
     plt.legend()

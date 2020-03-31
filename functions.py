@@ -3,6 +3,8 @@ def objectiveFunction(u_guess,*arg):
     import model
     import numpy as np
     import matplotlib.pyplot as plt
+    import pickle
+    
     # Unpacking Testing Values for U
     U_test = u_guess
     # Unpacking Values Sendt Throw Arguments
@@ -18,6 +20,7 @@ def objectiveFunction(u_guess,*arg):
     Y_array_test = np.zeros(NS_pred_horizion_test)
     U_array_test = np.zeros(NS_pred_horizion_test)
     
+    #%% SISO
     # Defining parameters for the testing model
     timeDelay_test = 10
     K_test = 4
@@ -33,11 +36,13 @@ def objectiveFunction(u_guess,*arg):
                                       initStateValue = initStateValue_test,
                                       initDelayValue = initDelayValue_test
                                       )
-                                      
+                               
+    #%% MIMO
+       
     
     ###########################################
     #|||||||||||||||||||||||||||||||||||||||||#
-    #     Testing Values for U on Model       #
+    #%%     Testing Values for U on Model     #
     #|||||||||||||||||||||||||||||||||||||||||#
     ###########################################
 
@@ -55,22 +60,41 @@ def objectiveFunction(u_guess,*arg):
         Y_array_test[k] = obj_model_test.run(u_k = U_array_test[k]) 
 
 
-    #     DONE SIMULATING "REALSYSTEM"       #
+    #|||||||||||||||||||||||||||||||||||||||||#
+    #%%       PLOTTING THE SIMULATION         #
     #|||||||||||||||||||||||||||||||||||||||||#
     
-    plt.figure(2)
-    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
-    plt.plot(pred_horizion_array_test,Y_array_test,label="Output")
-    plt.legend()
-    plt.grid()
-    plt.show()
+#    plt.figure(2)
+#    plt.title(f"U:{U_array_test[::1500]} \nerror:{5} \nFrom OBJ.FUNK")
+#    plt.plot(pred_horizion_array_test,U_array_test,label="input")
+#    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
+#    plt.plot(pred_horizion_array_test,Y_array_test,label="Output")
+#    plt.legend()
+#    plt.grid()
+#    plt.show()
     
-    error = np.sum(abs(SP_array_test-Y_array_test))
+    #|||||||||||||||||||||||||||||||||||||||||#
+    #%%       Dumping array to file        #
+    #|||||||||||||||||||||||||||||||||||||||||#
+    with open("predArray.data","wb") as datafile:
+        pickle.dump((pred_horizion_array_test,
+                     U_array_test,
+                     Y_array_test,
+                     SP_array_test
+                     ),
+                    datafile)
+        
+        
+    #|||||||||||||||||||||||||||||||||||||||||#
+    #%%    calculating objective equation     #
+    #|||||||||||||||||||||||||||||||||||||||||#
+    
+    error = np.sum(abs(SP_array_test**2-Y_array_test**2))
     return error
 
 
 
-
+#%% RUNNING CODE
 if __name__ == "__main__":
     import numpy as np
    # import matplotlib.pyplot as plt
@@ -82,5 +106,5 @@ if __name__ == "__main__":
     time = np.linspace(start,stop,ns)
     Y = time * 0
     
-    # objectiveFunction(U, dt, SP, PredTime, initStateValue, initDelayValue)
-    objectiveFunction([1,0,0.5],0.1,2,300,0,0)
+    # objectiveFunction(U,      dt, SP, PredTime, initStateValue, initDelayValue)
+    objectiveFunction([1,0,0.5],0.1,2,  300,      2,              2)

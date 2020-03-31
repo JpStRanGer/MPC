@@ -1,18 +1,19 @@
 class secDegModel:
-    def __init__(self, dt, K =1, Tc1 = 4, Tc2 = 4, timeDelay = 10, initStateValue = 0, initDelayValue = 1):
+    def __init__(self, dt, K =1, Tc1 = 30, Tc2 = 60, timeDelay = 10, initStateValue = 0, initDelayValue = 1, offset = 5):
         # Import Needed Modules
         
         # Define objects
         self._obj_delay = timedelay(timeDelay = timeDelay, dt = dt, initDelayValue = initDelayValue)
         #self._obj_delay = timedelay(timeDelay,dt)
         # Define Model Parameters
+        self.offset = offset
         self._dt = dt
         self._K = K
         self._Tc1 = Tc1
         self._Tc2 = Tc2
         # Define State Variables
-        self._y1_k = initStateValue -2
-        self._y2_k = initStateValue - 2
+        self._y1_k = initStateValue - offset
+        self._y2_k = initStateValue - offset
         
     def run(self, u_k):
         dt = self._dt
@@ -25,7 +26,7 @@ class secDegModel:
         u_k *= -K
         self._y1_k = (((dt)/(Tc1+dt))*u_k) + ((Tc1/(Tc1+dt))*self._y1_k)
         self._y2_k = (((dt)/(Tc2+dt))*self._y1_k) + ((Tc2/(Tc2+dt))*self._y2_k)
-        return self._y2_k +2
+        return self._y2_k + self.offset
     
     def setState(self,NewState):
         self._y1_k = NewState
