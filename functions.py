@@ -22,10 +22,10 @@ def objectiveFunction(u_guess,*arg):
     
     #%% SISO
     # Defining parameters for the testing model
-    timeDelay_test = 10
+    timeDelay_test = 0
     K_test = 4
-    Tc1_test = 30
-    Tc2_test = 60
+    Tc1_test = 10
+    Tc2_test = 40
     
     # Defining Model Object
     obj_model_test = model.secDegModel(dt = dt_test,
@@ -34,7 +34,8 @@ def objectiveFunction(u_guess,*arg):
                                       Tc2 = Tc2_test,
                                       timeDelay = timeDelay_test,
                                       initStateValue = initStateValue_test,
-                                      initDelayValue = initDelayValue_test
+                                      initDelayValue = initDelayValue_test,
+                                      offset = 6
                                       )
                                
     #%% MIMO
@@ -57,6 +58,7 @@ def objectiveFunction(u_guess,*arg):
 
     # Running simulation of "real" model function
     for k in range(NS_pred_horizion_test):
+        # Y_array_test[k] = obj_model_test.run(u_k = 0) 
         Y_array_test[k] = obj_model_test.run(u_k = U_array_test[k]) 
 
 
@@ -64,33 +66,29 @@ def objectiveFunction(u_guess,*arg):
     #%%       PLOTTING THE SIMULATION         #
     #|||||||||||||||||||||||||||||||||||||||||#
     
-#    plt.figure(2)
-#    plt.title(f"U:{U_array_test[::1500]} \nerror:{5} \nFrom OBJ.FUNK")
-#    plt.plot(pred_horizion_array_test,U_array_test,label="input")
-#    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
-#    plt.plot(pred_horizion_array_test,Y_array_test,label="Output")
-#    plt.legend()
-#    plt.grid()
-#    plt.show()
+    plt.figure(2)
+    plt.title(f"U:{U_array_test[::1000]} \nY:{Y_array_test[::1000]} \nSP:{U_array_test[::1000]} \nerror:{5} \nFrom OBJ.FUNK")
+    plt.plot(pred_horizion_array_test,U_array_test,label="input")
+    plt.plot(pred_horizion_array_test,SP_array_test,label="setpoint")
+    plt.plot(pred_horizion_array_test,Y_array_test,label="Output")
+    plt.legend()
+    plt.grid()
+    plt.show()
     
     #|||||||||||||||||||||||||||||||||||||||||#
     #%%       Dumping array to file        #
     #|||||||||||||||||||||||||||||||||||||||||#
-    with open("predArray.data","wb") as datafile:
-        pickle.dump((pred_horizion_array_test,
-                     U_array_test,
-                     Y_array_test,
-                     SP_array_test
-                     ),
-                    datafile)
-        
+    with open('predArray.data',"wb") as datafile:
+        pickle.dump((pred_horizion_array_test, U_array_test, Y_array_test, SP_array_test), datafile)
+    datafile.close()
         
     #|||||||||||||||||||||||||||||||||||||||||#
     #%%    calculating objective equation     #
     #|||||||||||||||||||||||||||||||||||||||||#
     
-    error = np.sum(abs(SP_array_test**2-Y_array_test**2))
-    return error
+    modelError = np.sum(SP_array_test-Y_array_test)
+    J = modelError
+    return J
 
 
 
@@ -107,4 +105,4 @@ if __name__ == "__main__":
     Y = time * 0
     
     # objectiveFunction(U,      dt, SP, PredTime, initStateValue, initDelayValue)
-    objectiveFunction([1,0,0.5],0.1,2,  300,      2,              2)
+    objectiveFunction([1],0.1,2,  100,      0,              0)

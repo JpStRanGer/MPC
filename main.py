@@ -20,10 +20,10 @@ ns = int((stop-start)/dt)+1
 time = np.linspace(start,stop,ns)
 
 # Definging SETPOINT
-SP = np.array([1 if t < 500 else
-               2 for t in time])
+SP = np.array([15 if t < 500 else
+               20 for t in time])
 
-U = SP#time * 0
+U = time * 0
 turb = time * 0
 
 prediction_horizion = 200
@@ -31,7 +31,7 @@ predTime = np.linspace(0,prediction_horizion,int(prediction_horizion/dt)+1)
 
 # Define Objects
 obj_processModel = model.secDegModel(dt)
-obj_mpc = MPC.mpc(dt = dt, pred_horizion_length = prediction_horizion)
+obj_mpc = mimoMPC.mpc(dt = dt, pred_horizion_length = prediction_horizion)
 
 #%% MAIN LOOP
 for k in range(len(time)):
