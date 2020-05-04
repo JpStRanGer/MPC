@@ -4,7 +4,7 @@ from scipy.optimize import minimize
 import model
 
 class mpc:
-    def __init__(self, dt, pred_horizion_length, numberOfIntputs, numberOfBlocks = 2  ):
+    def __init__(self, dt, pred_horizion_length, numberOfIntputs, numberOfBlocks):
         # Defining values
         self.dt = dt
         self.pred_horizion_length = pred_horizion_length # [Sec]
@@ -15,28 +15,34 @@ class mpc:
         self.numberOfInputs = len(self.u_opt)
         return
     
-    def run(self, SP, state, RUN_PLOT = 0):
+    def run(self, SP, initControlSignals, initstates, RUN_PLOT = 0):
         import numpy as np
         #import mimoFunctions
         from scipy.optimize import minimize
         self.RUN_PLOT = RUN_PLOT
         # values to be tested
         U_guess = self.u_opt
+#        U_guess = np.concatenate(self.u_opt)
         # ORGANISE VALUES
-        self.initStateValue_test = state
-        self.initDelayValue_test = state
+        self.initControlSignals_test = initControlSignals
+        self.TurbInitStateValue_test = initstates['turb']
+        self.AlkalinityInitStateValue_test = initstates['alkalinity']
+        self.PhosphateInitStateValue_test = initstates['phosphate']
         # values that should be sendt as arguments trough the optimizer
         self.setpoint =  SP
         arg_guess = (self.dt, 
                      self.setpoint, 
                      self.pred_horizion_length,
-                     self.initStateValue_test,
+                     self.initControlSignals_test,
+                     self.TurbInitStateValue_test,
+                     self.AlkalinityInitStateValue_test,
+                     self.PhosphateInitStateValue_test,
                      self.numberOfBlocks,
                      self.RUN_PLOT
                      )
         self.ub = 0
-        self.lb = 20
-        # self.u_bounds = [(self.ub,self.lb) for x in range(len(U_guess))]
+        self.lb = 40
+#       self.u_bounds = [(self.ub,self.lb) for x in range(len(U_guess))]
         self.u_bounds = [(self.ub,self.lb) for x in range(np.size(self.u_opt))]
         # Run Optimizer
         self.solution_guess = minimize(mimoFunctions.objectiveFunction,
@@ -51,8 +57,9 @@ class mpc:
         print("self.numberOfInputs: ",self.numberOfInputs)
         print("self.solution_guess.x[0]: ",self.solution_guess.x[0])
         print("self.solution_guess:\n ",self.solution_guess.x)
-        print("self.u_opt: ",self.u_opt)
-        print("RETURNING OUT OF MPC: ",np.transpose(self.u_opt)[0])
+        print("self.u_opt: \n",self.u_opt)
+        print("U_guess: \n",U_guess)
+        print("RETURNING OUT OF MPC:\n ",np.transpose(self.u_opt)[0])
         print("\n\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/")
         
         # Returning the first optimal control output from every control variable
@@ -76,14 +83,39 @@ if __name__ == "__main__":
     # DEFINING ARRAYS
     time = np.linspace(start,stop,ns)
     Y = time * 0
+        
+    # SS/TURB input
+    U_SS = time * 0 + 2 * np.sin(2*np.pi*time/600) + 20
     
-    
+    prediction_horizion = 300
+    numberOfBlocks = 3
+    numberOfIntputs = 3
     #objectiveFunction(1,0.1,2,200)
-    obj_mpc = mpc(dt = dt, numberOfIntputs = 1, pred_horizion_length = 180)
+    obj_mpc = mpc(dt = dt, numberOfIntputs = numberOfIntputs, pred_horizion_length = prediction_horizion, numberOfBlocks = numberOfBlocks)
     
+    controlsignals = [0,0,0,U_SS]
+        
+    U_turb_PIX_INITIAL = [0,0]
+    U_turb_PAX_INITIAL = [0,0]
+    U_turb_POL_INITIAL = [0,0]
+    TurbModelStates = [U_turb_PIX_INITIAL, U_turb_PAX_INITIAL, U_turb_POL_INITIAL, U_SS[0]]
+    
+    U_alkalinity_PIX_INITIAL = [0,0]
+    U_alkalinity_PAX_INITIAL = [0,0]
+    U_alkalinity_POL_INITIAL = [0,0]
+    alkalinityModelStates = [U_turb_PIX_INITIAL, U_turb_PAX_INITIAL, U_turb_POL_INITIAL, U_SS[0]]
+    
+    U_phosphate_PIX_INITIAL = [0,0]
+    U_phosphate_PAX_INITIAL = [0,0]
+    U_phosphate_POL_INITIAL = [0,0]
+    phosphateModelStates = [U_turb_PIX_INITIAL, U_turb_PAX_INITIAL, U_turb_POL_INITIAL, U_SS[0]]
+    
+    
+    modelStates = {'turb':TurbModelStates, 'alkalinity':alkalinityModelStates, 'phosphate':phosphateModelStates}
     
     tic = TIME.time()
-    result = obj_mpc.run(SP = 15, state = [100,30,3] , RUN_PLOT = 1)
+    
+    result = obj_mpc.run(SP = 15, initControlSignals = controlsignals, initstates = modelStates, RUN_PLOT = 1)
     toc = TIME.time()
     exeTime = toc - tic
     
@@ -92,7 +124,7 @@ if __name__ == "__main__":
     with open("predArray.data","rb") as datafile2:
         predArrays = pickle.load(datafile2)
 
-    predTime, predTURB, predSP, predPIX, predSS, predError, avgError = predArrays
+    predTime, predTURB, predTURB_SP, predALKALINITY, predPHOSPATE, predPHOSPATE_SP, predPIX, predPAX, predPOL, predSS, predError, avgError = predArrays
     
     fig, ax = plt.subplots(nrows=2,ncols=1, figsize = [10,10])
     fig.suptitle("From mimoMPC.py\ntotal Error: {:0.2f} Average Error: {:0.2}\ntime of one prediction: ".format(predError,avgError) + str(exeTime))#
@@ -101,17 +133,20 @@ if __name__ == "__main__":
     ax[0].set_ylabel('L/s')
     ax[0].set_xlabel('min')
     ax[0].plot(predTime, predPIX, linewidth=1, label='Predicted PIX')
+    ax[0].plot(predTime, predPAX, linewidth=1, label='Predicted PAX')
+    ax[0].plot(predTime, predPOL, linewidth=1, label='Predicted POL')
     ax[0].plot(predTime, predSS, linewidth=1, label='Predicted SS')
+#    ax[0].set_ylim(0,50)
     ax[1].set_title("Outputs")
     ax[1].set_ylabel('Turb (FTU)')
-    ax[1].set_ylim([0,30])
+#    ax[1].set_ylim([0,30])
     ax[1].plot(predTime, predTURB,'g-', linewidth=1, label='Predicted TURB')
-    ax[1].plot(predTime, predSP,'r-', linewidth=1, label='Setpoint TURB')
+    ax[1].plot(predTime, predTURB_SP,'r-', linewidth=1, label='Setpoint TURB')
     
     for i in ax: i.grid(),i.legend()
     # plt.legend()
     
-    print("predArrays",len(predArrays[0]))
+    print("predArrays",len(predArrays))
     
     
     
