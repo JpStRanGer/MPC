@@ -23,7 +23,7 @@ UniqPlotId = str(uuid.uuid1())
 
 #%% TIME PARAMETRIZATION
 start = 0
-stop = 750 # minuts
+stop = 800 # minuts
 dt = 10
 ns = int((stop-start)/dt)+1
 time = np.linspace(start,stop,ns)
@@ -191,7 +191,7 @@ for k in range(len(time)-1):
     plt.plot(time[:k+1], phosphate[:k+1], 'C7', label="phosphate")
     plt.plot(time[:k+1], phosphate_SP[:k+1], 'C8', label="Phosphate SP")
     
-    if k*dt <= time[-1]-predTime[-1]:
+    if k*dt < time[-1]-predTime[-1]:
         plt.plot(predTime + time[k], predPIX, 'C0--')#, label="Predictied PIX")
         plt.plot(predTime + time[k], predPAX, 'C4--')#, label="Predictied PAX")
         plt.plot(predTime + time[k], predPOL, 'C5--')#, label="Predictied POL")
@@ -202,24 +202,25 @@ for k in range(len(time)-1):
         plt.plot(predTime + time[k], predPHOSPATE, 'C7--')#, label="Pred Phosphate")
         plt.plot(predTime + time[k], predPHOSPATE_SP, 'C8--')#, label="Pred Phosphate SP")
     else:
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predPIX[:-int(time[-1]-time[k])] , 'C0--')#, label="Predictied PIX")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predPAX[:-int(time[-1]-time[k])] , 'C4--')#, label="Predictied PAX")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predPOL[:-int(time[-1]-time[k])] , 'C5--')#, label="Predictied POL")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predTURB_SP[:-int(time[-1]-time[k])] , 'C5--')#, label="Predicted Turb SP")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predTURB[:-int(time[-1]-time[k])] , 'C2--')#, label="Predicted Turb")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predSS[:-int(time[-1]-time[k])] , 'C3--')#, label="Predicted SS")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predALKALINITY[:-int(time[-1]-time[k])] , 'C6--')#, label="Pred alkalinity")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predPHOSPATE[:-int(time[-1]-time[k])] , 'C7--')#, label="Pred Phosphate")
-        plt.plot(predTime[:-int(time[-1]-time[k])] + time[k], predPHOSPATE_SP[:-int(time[-1]-time[k])] , 'C8--')#, label="Pred Phosphate SP")
+        predTime = predTime[:(len(time)-k)]
+        plt.plot(predTime + time[k], predPIX[:len(predTime)] , 'C0--')#, label="Predictied PIX")
+        plt.plot(predTime + time[k], predPAX[:len(predTime)] , 'C4--')#, label="Predictied PAX")
+        plt.plot(predTime + time[k], predPOL[:len(predTime)] , 'C5--')#, label="Predictied POL")
+        plt.plot(predTime + time[k], predTURB_SP[:len(predTime)] , 'C5--')#, label="Predicted Turb SP")
+        plt.plot(predTime + time[k], predTURB[:len(predTime)] , 'C2--')#, label="Predicted Turb")
+        plt.plot(predTime + time[k], predSS[:len(predTime)] , 'C3--')#, label="Predicted SS")
+        plt.plot(predTime + time[k], predALKALINITY[:len(predTime)] , 'C6--')#, label="Pred alkalinity")
+        plt.plot(predTime + time[k], predPHOSPATE[:len(predTime)] , 'C7--')#, label="Pred Phosphate")
+        plt.plot(predTime + time[k], predPHOSPATE_SP[:len(predTime)] , 'C8--')#, label="Pred Phosphate SP")
     
-    leg = plt.legend( bbox_to_anchor = [1.1, 1])
+    leg = plt.legend( bbox_to_anchor = [1.23, 0.7])
     plt.axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
 #    plt.xlim([0,100+k]) 
     plt.xlim([0,time[-1]])
 #    leg = plt.legend( loc = 'upper right')
     plt.grid()
-    # plt.savefig('plot/Plott '+ UniqPlotId, bbox_inches='tight', dpi=1) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber), bbox_inches='tight')
-    plt.savefig('plot/Plott '+ UniqPlotId) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber))
+    plt.savefig('plot/Plott '+ UniqPlotId, bbox_inches='tight', dpi=1) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber), bbox_inches='tight')
+#    plt.savefig('plot/Plott '+ UniqPlotId) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber))
     plt.show()
     
     print("U_PIX[k]:",U_PIX[k]," k:",k," time:",int(k*dt))
