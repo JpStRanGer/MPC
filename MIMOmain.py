@@ -76,37 +76,6 @@ phosphateModelStates = [U_turb_PIX_INITIAL, U_turb_PAX_INITIAL, U_turb_POL_INITI
 
 modelStates = {'turb':TurbModelStates, 'alkalinity':alkalinityModelStates, 'phosphate':phosphateModelStates}
 
-# =============================================================================
-# # DEFING MODEL PARAMETERS FOR "REALSYSTEM"
-# =============================================================================
-# turbParrameters = {
-#         'pix' : {
-#             'K' : 2,
-#             'Tc1' : 10,
-#             'Tc2' : 4,
-#             'timeDelay' : 0,
-#             'initDelayValue' : 0,
-#             'offset' : 0
-#             },
-#         'pax' : {
-#             'K' : 3,
-#             'Tc1' : 30,
-#             'Tc2' : 8,
-#             'timeDelay' : 30,
-#             'initDelayValue' : 0,
-#             'offset' : 0
-#             },
-#         'pol' : {
-#             'K' : 0.5,
-#             'Tc1' : 10,
-#             'Tc2' : 4,
-#             'timeDelay' : 60,
-#             'initDelayValue' : 0,
-#             'offset' : 0
-#             },
-#         }
-
-
 # DEFINING OUTPUT ARRAYS
 turb = time * 0
 alkalinity = time * 0
@@ -173,52 +142,117 @@ for k in range(len(time)-1):
     minuts, seconds = minutsAndSeconds
     
     #%% START REALTIME PLOTTING
-    plt.figure(1,figsize=[10,6])
     title = "Run from MAIN (K:{}, Time: {:0.2f} (min?)".format(k, time[k])
     title += " \n Real execution time: {:02.0f}m:{:02.0f}s".format(*minutsAndSeconds)
+    # plt.figure(1,figsize=[10,6])
     # title += " - Pred hori.:{}min, N.Blocks: {} )".format(prediction_horizion, numberOfBlocks)
     # title += "\nturb[k]: {:0.2}, U_PIX[k]: {:0.3}\nPrediction horizion:{}min, N.Blocks: {} )".format(turb[k], U_PIX[k],prediction_horizion, numberOfBlocks)
-    plt.title(title)
-    # plt.title("From MAIN (K:{}, Time: {:0.2f} (min?)\nReal execution time: {:02.0f}m:{:02.0f}s\nturb[k]: {:0.2}, U_PIX[k]: {:0.3}\nPrediction horizion:{}min, N.Blocks: {} )".format(k, time[k], *minutsAndSeconds, turb[k], U_PIX[k],prediction_horizion, numberOfBlocks))
+#    plt.title(title)
+#    # plt.title("From MAIN (K:{}, Time: {:0.2f} (min?)\nReal execution time: {:02.0f}m:{:02.0f}s\nturb[k]: {:0.2}, U_PIX[k]: {:0.3}\nPrediction horizion:{}min, N.Blocks: {} )".format(k, time[k], *minutsAndSeconds, turb[k], U_PIX[k],prediction_horizion, numberOfBlocks))
+#    
+#    plt.plot(time[:k+1], U_PIX[:k+1], 'C0', label="controler PIX")
+#    plt.plot(time[:k+1], U_PAX[:k+1], 'C4', label="controler PAX")
+#    plt.plot(time[:k+1], U_POL[:k+1], 'C5', label="controler POL")
+#    plt.plot(time[:], SP[:], 'C1', label="Setpunkt Turb")
+#    plt.plot(time[:k+1], turb[:k+1], 'C2', label="Turb (REAL)")
+#    plt.plot(time[:k+1], U_SS[:k+1], 'C3', label="REAL SS inn")
+#    plt.plot(time[:k+1], alkalinity[:k+1], 'C6', label="alkalinity")
+#    plt.plot(time[:k+1], phosphate[:k+1], 'C7', label="phosphate")
+#    plt.plot(time[:k+1], phosphate_SP[:k+1], 'C8', label="Phosphate SP")
+#    
+#    if k*dt < time[-1]-predTime[-1]:
+#        plt.plot(predTime + time[k], predPIX, 'C0--')#, label="Predictied PIX")
+#        plt.plot(predTime + time[k], predPAX, 'C4--')#, label="Predictied PAX")
+#        plt.plot(predTime + time[k], predPOL, 'C5--')#, label="Predictied POL")
+#        plt.plot(predTime + time[k], predTURB_SP, 'C5--')#, label="Predicted Turb SP")
+#        plt.plot(predTime + time[k], predTURB, 'C2--')#, label="Predicted Turb")
+#        plt.plot(predTime + time[k], predSS, 'C3--')#, label="Predicted SS")
+#        plt.plot(predTime + time[k], predALKALINITY, 'C6--')#, label="Pred alkalinity")
+#        plt.plot(predTime + time[k], predPHOSPATE, 'C7--')#, label="Pred Phosphate")
+#        plt.plot(predTime + time[k], predPHOSPATE_SP, 'C8--')#, label="Pred Phosphate SP")
+#    else:
+#        predTime = predTime[:(len(time)-k)]
+#        plt.plot(predTime + time[k], predPIX[:len(predTime)] , 'C0--')#, label="Predictied PIX")
+#        plt.plot(predTime + time[k], predPAX[:len(predTime)] , 'C4--')#, label="Predictied PAX")
+#        plt.plot(predTime + time[k], predPOL[:len(predTime)] , 'C5--')#, label="Predictied POL")
+#        plt.plot(predTime + time[k], predTURB_SP[:len(predTime)] , 'C5--')#, label="Predicted Turb SP")
+#        plt.plot(predTime + time[k], predTURB[:len(predTime)] , 'C2--')#, label="Predicted Turb")
+#        plt.plot(predTime + time[k], predSS[:len(predTime)] , 'C3--')#, label="Predicted SS")
+#        plt.plot(predTime + time[k], predALKALINITY[:len(predTime)] , 'C6--')#, label="Pred alkalinity")
+#        plt.plot(predTime + time[k], predPHOSPATE[:len(predTime)] , 'C7--')#, label="Pred Phosphate")
+#        plt.plot(predTime + time[k], predPHOSPATE_SP[:len(predTime)] , 'C8--')#, label="Pred Phosphate SP")
+#    
+#    leg = plt.legend( bbox_to_anchor = [1.23, 0.7])
+#    plt.axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+##    plt.xlim([0,100+k]) 
+#    plt.xlim([0,time[-1]])
+##    leg = plt.legend( loc = 'upper right')
+#    plt.grid()
     
-    plt.plot(time[:k+1], U_PIX[:k+1], 'C0', label="controler PIX")
-    plt.plot(time[:k+1], U_PAX[:k+1], 'C4', label="controler PAX")
-    plt.plot(time[:k+1], U_POL[:k+1], 'C5', label="controler POL")
-    plt.plot(time[:], SP[:], 'C1', label="Setpunkt Turb")
-    plt.plot(time[:k+1], turb[:k+1], 'C2', label="Turb (REAL)")
-    plt.plot(time[:k+1], U_SS[:k+1], 'C3', label="REAL SS inn")
-    plt.plot(time[:k+1], alkalinity[:k+1], 'C6', label="alkalinity")
-    plt.plot(time[:k+1], phosphate[:k+1], 'C7', label="phosphate")
-    plt.plot(time[:k+1], phosphate_SP[:k+1], 'C8', label="Phosphate SP")
     
-    if k*dt < time[-1]-predTime[-1]:
-        plt.plot(predTime + time[k], predPIX, 'C0--')#, label="Predictied PIX")
-        plt.plot(predTime + time[k], predPAX, 'C4--')#, label="Predictied PAX")
-        plt.plot(predTime + time[k], predPOL, 'C5--')#, label="Predictied POL")
-        plt.plot(predTime + time[k], predTURB_SP, 'C5--')#, label="Predicted Turb SP")
-        plt.plot(predTime + time[k], predTURB, 'C2--')#, label="Predicted Turb")
-        plt.plot(predTime + time[k], predSS, 'C3--')#, label="Predicted SS")
-        plt.plot(predTime + time[k], predALKALINITY, 'C6--')#, label="Pred alkalinity")
-        plt.plot(predTime + time[k], predPHOSPATE, 'C7--')#, label="Pred Phosphate")
-        plt.plot(predTime + time[k], predPHOSPATE_SP, 'C8--')#, label="Pred Phosphate SP")
-    else:
-        predTime = predTime[:(len(time)-k)]
-        plt.plot(predTime + time[k], predPIX[:len(predTime)] , 'C0--')#, label="Predictied PIX")
-        plt.plot(predTime + time[k], predPAX[:len(predTime)] , 'C4--')#, label="Predictied PAX")
-        plt.plot(predTime + time[k], predPOL[:len(predTime)] , 'C5--')#, label="Predictied POL")
-        plt.plot(predTime + time[k], predTURB_SP[:len(predTime)] , 'C5--')#, label="Predicted Turb SP")
-        plt.plot(predTime + time[k], predTURB[:len(predTime)] , 'C2--')#, label="Predicted Turb")
-        plt.plot(predTime + time[k], predSS[:len(predTime)] , 'C3--')#, label="Predicted SS")
-        plt.plot(predTime + time[k], predALKALINITY[:len(predTime)] , 'C6--')#, label="Pred alkalinity")
-        plt.plot(predTime + time[k], predPHOSPATE[:len(predTime)] , 'C7--')#, label="Pred Phosphate")
-        plt.plot(predTime + time[k], predPHOSPATE_SP[:len(predTime)] , 'C8--')#, label="Pred Phosphate SP")
     
-    leg = plt.legend( bbox_to_anchor = [1.23, 0.7])
-    plt.axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
-#    plt.xlim([0,100+k]) 
-    plt.xlim([0,time[-1]])
-#    leg = plt.legend( loc = 'upper right')
-    plt.grid()
+    
+    
+    fig, ax = plt.subplots(7,1, constrained_layout=True,sharex=True, figsize=[10,7])
+    fig.suptitle(title, fontsize=16)
+    
+    
+    ax[0].set_title('PIX')
+    ax[0].plot(time[:k+1], U_PIX[:k+1], 'C0', label="controler PIX")
+    ax[0].plot(predTime + time[k], predPIX, 'C0--')#, label="Predictied PIX")
+    ax[0].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[0].set_xlim([0, time[-1]])
+    ax[0].grid(True)
+    
+    ax[1].set_title('PAX')
+    ax[1].plot(time[:k+1], U_PAX[:k+1], 'C4', label="controler PAX")
+    ax[1].plot(predTime + time[k], predPAX, 'C4--')#, label="Predictied PIX")
+    ax[1].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[1].grid(True)
+    
+    ax[2].set_title('POLYMER')
+    ax[2].plot(time[:k+1], U_POL[:k+1], 'C5', label="controler Polymer")
+    ax[2].plot(predTime + time[k], predPOL, 'C5--')#, label="Predictied PIX")
+    ax[2].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[2].grid(True)
+    
+    ax[3].set_title('Suspended Solids')
+    ax[3].plot(time[:k+1], U_SS[:k+1], 'C3', label="REAL SS inn")
+    ax[3].plot(predTime + time[k], predSS, 'C3--')#, label="Predicted SS")
+    ax[3].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[3].grid(True)
+    
+    ax[4].set_title('Turbidity')
+    ax[4].plot(time[:k+1], turb[:k+1], 'C2', label="Turb (REAL)")
+    ax[4].plot(predTime + time[k], predTURB, 'C2--')#, label="Predicted Turb")
+    ax[4].plot(time[:], SP[:], 'C1', label="Setpunkt Turb")
+    ax[4].plot(predTime + time[k], predTURB_SP, 'C5--')#, label="Predicted Turb SP")
+    ax[4].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[4].grid(True)
+    
+    ax[5].set_title('Alkalinity')
+    ax[5].plot(time[:k+1], alkalinity[:k+1], 'C6', label="alkalinity")
+    ax[5].plot(predTime + time[k], predALKALINITY, 'C6--')#, label="Pred alkalinity")
+    ax[5].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[5].grid(True)
+    
+    ax[6].set_title('phosphate')
+    ax[6].plot(time[:k+1], phosphate[:k+1], 'C7', label="phosphate")
+    ax[6].plot(time[:k+1], phosphate_SP[:k+1], 'C8', label="Phosphate SP")
+    ax[6].plot(predTime + time[k], predPHOSPATE, 'C7--')#, label="Pred Phosphate")
+    ax[6].plot(predTime + time[k], predPHOSPATE_SP, 'C8--')#, label="Pred Phosphate SP")
+    ax[6].axvline(x=k*dt, ymin=0, ymax=1, color = 'black')
+    ax[6].grid(True)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     plt.savefig('plot/Plott '+ UniqPlotId, bbox_inches='tight', dpi=1) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber), bbox_inches='tight')
 #    plt.savefig('plot/Plott '+ UniqPlotId) if video == False else plt.savefig('plot/framebuffer/frame {:05d}'.format(PlotNumber))
     plt.show()

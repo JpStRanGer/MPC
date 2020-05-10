@@ -118,85 +118,85 @@ def objectiveFunction(u_guess,*arg):
     PAX_array_test = makeblockInputArray(arrayLength = NS_pred_horizion_test, blockValues =  U_PAX_blocks_test) if len(u_guess) >= 2 else PIX_array_test * 0
     POL_array_test = makeblockInputArray(arrayLength = NS_pred_horizion_test, blockValues =  U_POL_blocks_test) if len(u_guess) >= 2 else PIX_array_test * 0
 
-    #%% DEFINING MODEL PARAMETERS
-    turbParrameters_test = {
-        'pix' : {
-            'K' : 2,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pax' : {
-            'K' : 3,
-            'Tc1' : 30,
-            'Tc2' : 8,
-            'timeDelay' : 30,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pol' : {
-            'K' : 0.5,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 60,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        }
-    AlkalinityParrameters_test = {
-        'pix' : {
-            'K' : 6,
-            'Tc1' : 1,
-            'Tc2' : 4,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pax' : {
-            'K' : 3,
-            'Tc1' : 2,
-            'Tc2' : 8,
-            'timeDelay' : 30,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pol' : {
-            'K' : 0.5,
-            'Tc1' : 4,
-            'Tc2' : 4,
-            'timeDelay' : 60,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        }
-    phosphateParrameters_test = {
-        'pix' : {
-            'K' : 0.1,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pax' : {
-            'K' : 0.2,
-            'Tc1' : 30,
-            'Tc2' : 8,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pol' : {
-            'K' : 0.5,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        }
+#    #%% DEFINING MODEL PARAMETERS
+#    turbParrameters_test = {
+#        'pix' : {
+#            'K' : 2,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pax' : {
+#            'K' : 3,
+#            'Tc1' : 30,
+#            'Tc2' : 8,
+#            'timeDelay' : 30,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pol' : {
+#            'K' : 0.5,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 60,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        }
+#    AlkalinityParrameters_test = {
+#        'pix' : {
+#            'K' : 6,
+#            'Tc1' : 1,
+#            'Tc2' : 4,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pax' : {
+#            'K' : 3,
+#            'Tc1' : 2,
+#            'Tc2' : 8,
+#            'timeDelay' : 30,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pol' : {
+#            'K' : 0.5,
+#            'Tc1' : 4,
+#            'Tc2' : 4,
+#            'timeDelay' : 60,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        }
+#    phosphateParrameters_test = {
+#        'pix' : {
+#            'K' : 0.1,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pax' : {
+#            'K' : 0.2,
+#            'Tc1' : 30,
+#            'Tc2' : 8,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pol' : {
+#            'K' : 0.5,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        }
     ###########################################
     #|||||||||||||||||||||||||||||||||||||||||#
     #%% OBJECTS DECLARATIONS      
@@ -251,38 +251,50 @@ def objectiveFunction(u_guess,*arg):
 # calculating model error
 # =============================================================================
     # modelError = np.sum((SP_TURB_array_test-Turb_array_test)**2)
-    turbError = np.clip((SP_TURB_array_test-Turb_array_test), 0, np.inf)
-    modelError = np.sum(turbError**2)
+    turbErrorArray = np.clip((Turb_array_test - SP_TURB_array_test), 0, np.inf)
+    TurbSumError = np.sum(turbErrorArray**2)
 #     modelError = np.sum(abs(SP_TURB_array_test-Turb_array_test)**2)
-    avgError = np.average(abs(SP_TURB_array_test-Turb_array_test))
+    avgError = np.average(abs(Turb_array_test - SP_TURB_array_test))
     
 # =============================================================================
 # calculating alkalinity
 # =============================================================================
-    alkalinityError = np.sum((Alkalinity_array_test)**2)
+    alkalinitySumError = np.sum((Alkalinity_array_test))
     
 # =============================================================================
 # calculating phosphate error
 # =============================================================================
-    phosphateError = np.sum((SP_PHOSPHATE_array_test - Phosphate_array_test)**2)
+    phosphateErrorArray = np.clip((Phosphate_array_test - SP_PHOSPHATE_array_test), 0, np.inf)
+    phosphateSumError = np.sum(phosphateErrorArray**2)
     
 # =============================================================================
 # calculating chemical economical cost
 # =============================================================================
-    paxcost = np.sum(PAX_array_test * 0)**2
-    pixcost = np.sum(PIX_array_test * 0)**2
-    polcost = np.sum(POL_array_test * 0)**2
+    costOfPIX = 1295 # Nok/ton
+    PIXdensity = 0.0015 # ton/l
+    costOfPAX = 2945 # Nok/ton
+    PAXdensity = 0.001234 # ton/l
+    costOfPOL = 28 # Nok/ton
+    POLdensity = 0. # ton/l
+    pixcost = np.sum(PIX_array_test * dt_test * PIXdensity * costOfPIX)**2
+    paxcost = np.sum(PAX_array_test * dt_test * PAXdensity * costOfPAX)**2
+    polcost = np.sum(POL_array_test * dt_test * POLdensity * costOfPOL)**2
+    
+# =============================================================================
+# Calculating The Objectfunction Cost
+# =============================================================================
+    C1 = 100; C2 = 1; C3 = 1; C4 = 1; C5 = 1; C6 = 1
 # =============================================================================
 # Summating all values for J
 # =============================================================================
-    J = modelError + alkalinityError + phosphateError + paxcost + pixcost + polcost
+    J = C1*TurbSumError - C2*alkalinitySumError + C3*phosphateSumError + C4*pixcost + C5*paxcost
 
     #|||||||||||||||||||||||||||||||||||||||||#
     #%%       PLOTTING THE SIMULATION         #
     #|||||||||||||||||||||||||||||||||||||||||#
     if RUN_PLOT:
         plt.figure(2)
-        plt.title("U:{} \nY:{} \nSP:{} \nerror:{:0.2f} \nFrom OBJ.FUNK".format(U_PIX_blocks_test, np.average(Turb_array_test), PIX_array_test[-1], modelError))
+        plt.title("U:{} \nY:{} \nSP:{} \nerror:{:0.2f} \nFrom OBJ.FUNK".format(U_PIX_blocks_test, np.average(Turb_array_test), PIX_array_test[-1], TurbSumError))
         plt.plot(pred_horizion_array_test,PIX_array_test,label="input PIX")
         plt.plot(pred_horizion_array_test,PAX_array_test,label="input PAX") if len(u_guess) >= 2 else None
         plt.plot(pred_horizion_array_test,POL_array_test,label="input POL") if len(u_guess) >= 3 else None
@@ -315,7 +327,7 @@ def objectiveFunction(u_guess,*arg):
                       PAX_array_test, 
                       POL_array_test, 
                       U_SS_test, 
-                      modelError, 
+                      TurbSumError, 
                       avgError
                       )
             pickle.dump(arrays, datafile)

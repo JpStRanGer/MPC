@@ -208,6 +208,7 @@ class mimoMODEL:
 if __name__ == "__main__":
     import numpy as np
     import matplotlib.pyplot as plt
+    import modelparameters
     
     start = 0
     stop = 1200
@@ -257,34 +258,34 @@ if __name__ == "__main__":
     modelStates = [U_PIX_INITIAL, U_PAX_INITIAL, U_POL_INITIAL, U_SS[0]]
     
     #%% DEFINING MODEL PARAMENTERS
-    turbParrameters = {
-        'pix' : {
-            'K' : 2,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 0,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pax' : {
-            'K' : 3,
-            'Tc1' : 30,
-            'Tc2' : 8,
-            'timeDelay' : 30,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        'pol' : {
-            'K' : 0.5,
-            'Tc1' : 10,
-            'Tc2' : 4,
-            'timeDelay' : 60,
-            'initDelayValue' : 0,
-            'offset' : 0
-            },
-        }
+#    turbParrameters = {
+#        'pix' : {
+#            'K' : 2,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 0,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pax' : {
+#            'K' : 3,
+#            'Tc1' : 30,
+#            'Tc2' : 8,
+#            'timeDelay' : 30,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        'pol' : {
+#            'K' : 0.5,
+#            'Tc1' : 10,
+#            'Tc2' : 4,
+#            'timeDelay' : 60,
+#            'initDelayValue' : 0,
+#            'offset' : 0
+#            },
+#        }
     #%%MIMO model
-    obj_mimo = mimoMODEL(dt, modelStates, turbParrameters)
+    obj_mimo = mimoMODEL(dt, modelStates, modelparameters.turbParrameters)
     
     
     for k in range(len(time)):
